@@ -1,10 +1,9 @@
-﻿using RpgGame.Model.Item;
-using RpgGame.Model.Monster;
-
-namespace RpgGame.Model.Player
+﻿namespace RpgGame.Model.Player
 {
-    internal abstract class PlayerBase : IPlayBehaviour, IItem
+    public abstract class PlayerBase : IPlayBehaviour
     {
+        private double _currentHp;
+
         /// <summary>
         /// 经验
         /// </summary>
@@ -12,7 +11,17 @@ namespace RpgGame.Model.Player
         /// <summary>
         /// 血
         /// </summary>
-        public double Hp { get; set; }
+        public double MaxHp { get; set; }
+
+        /// <summary>
+        /// 当前血量
+        /// </summary>
+        public double CurrentHp
+        {
+            get { return _currentHp >= MaxHp ? MaxHp : _currentHp; }
+            set { _currentHp = value; }
+        }
+
         /// <summary>
         /// 每回合回血百分百
         /// </summary>
@@ -24,7 +33,11 @@ namespace RpgGame.Model.Player
         /// <summary>
         /// 蓝
         /// </summary>
-        public double Mp { get; set; }
+        public double MaxMp { get; set; }
+        /// <summary>
+        /// 当前蓝量 
+        /// </summary>
+        public double CurrentMp { get; set; }
         /// <summary>
         /// 防御力
         /// </summary>
@@ -52,7 +65,7 @@ namespace RpgGame.Model.Player
             throw new System.NotImplementedException();
         }
 
-        public bool Fight(MonsterBase monster)
+        public bool Fight(PlayerBase monster)
         {
             throw new System.NotImplementedException();
         }
@@ -61,6 +74,6 @@ namespace RpgGame.Model.Player
     {
         void EveryTurnStart();
         void EveryTurnEnd();
-        bool Fight(MonsterBase monster);
+        bool Fight(PlayerBase monster);
     }
 }
