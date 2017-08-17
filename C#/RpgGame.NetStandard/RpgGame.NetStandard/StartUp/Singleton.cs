@@ -1,7 +1,6 @@
 ﻿using System;
-using RpgGame.Model.DataBase;
 
-namespace RpgGame.StartUp
+namespace RpgGame.NetStandard.StartUp
 {
     internal class Singleton
     {

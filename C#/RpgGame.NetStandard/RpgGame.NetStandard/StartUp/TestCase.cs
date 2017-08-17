@@ -1,14 +1,12 @@
-﻿using RpgGame.Model.DataBase;
-using RpgGame.Model.Item;
+﻿using RpgGame.NetStandard.Model.Item;
 
-namespace RpgGame.StartUp
+namespace RpgGame.NetStandard.StartUp
 {
     public sealed class TestCase
     {
         public static void Test0()
         {
             var mdc = new RedMedicine();
-            var xx = mdc.Me.Count;
 
         }
     }
