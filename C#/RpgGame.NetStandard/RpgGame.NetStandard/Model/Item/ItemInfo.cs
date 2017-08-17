@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Exceptions;
@@ -17,7 +18,7 @@ namespace RpgGame.NetStandard.Model.Item
             Price = typeInfo.Price;
             Effect = typeInfo.Effect;
             _isUseSuccess = isUseSuccess;
-            _me = GameData.GetItem(this);
+            _me = GetItem();
         }
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace RpgGame.NetStandard.Model.Item
         }
 
         private readonly Func<object, ItemInfo, bool> _isUseSuccess;
-        private readonly Counter _me;
+        private readonly ItemCounter _me;
         public int Count => _me.Count;
         private readonly string _name;
         private readonly string _description;
@@ -76,6 +77,18 @@ namespace RpgGame.NetStandard.Model.Item
             {
                 throw new MsgException("物品不存在");
             }
+        }
+        public ItemCounter GetItem()
+        {
+            if (!GameData.ItemList.TryGetValue(this.GetType(), out var itemInfo))
+            {
+                itemInfo = new ItemCounter
+                {
+                    Base = this,
+                };
+                GameData.ItemList.Add(this.GetType(), itemInfo);
+            }
+            return itemInfo;
         }
     }
 }

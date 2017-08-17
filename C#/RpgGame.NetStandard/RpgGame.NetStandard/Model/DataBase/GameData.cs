@@ -1,28 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using RpgGame.NetStandard.Model.Item;
 using RpgGame.NetStandard.Model.Language;
 
 namespace RpgGame.NetStandard.Model.DataBase
 {
-    public class Counter
-    {
-        public Counter()
-        {
-            Count = 0;
-        }
 
-        public object Base { get; set; }
-        public int Count { get; internal set; }
-    }
-    public sealed class GameData
+    public static class GameData
     {
         public static double Gold;
         public static LanguageType LanType;
-        public static readonly List<Counter> ItemList;
+        public static readonly Dictionary<Type, ItemCounter> ItemList;
         static GameData()
         {
-            ItemList = new List<Counter>();
+            ItemList = new Dictionary<Type, ItemCounter>();
             LanType = LanguageType.Cn;
             Gold = 0;
         }
@@ -31,18 +24,5 @@ namespace RpgGame.NetStandard.Model.DataBase
             LanType = lanType;
         }
 
-        public static Counter GetItem<T>(T item2Get)
-        {
-            var itemInfo = ItemList.SingleOrDefault(i => i.Base.GetType() == item2Get.GetType());
-            if (itemInfo == null)
-            {
-                itemInfo = new Counter
-                {
-                    Base = item2Get,
-                };
-                ItemList.Add(itemInfo);
-            }
-            return itemInfo;
-        }
     }
 }
