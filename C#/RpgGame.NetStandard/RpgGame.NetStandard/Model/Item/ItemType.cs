@@ -1,14 +1,13 @@
 ﻿using System;
-using RpgGame.Model.Language;
 
-namespace RpgGame.Model.Item
+namespace RpgGame.NetStandard.Model.Item
 {
     public class ItemIntroAttribute : Attribute
     {
-        public ItemIntroAttribute(string name, string description, double effect, double price = 0, string toSting = "")
+        public ItemIntroAttribute(string name, string description, double effect, double price = 0)
         {
-            Name = name.L();
-            Description = string.Format(description, effect.ToString(toSting)).L();
+            Name = name;
+            Description = description;
             Price = price;
             Effect = effect;
         }

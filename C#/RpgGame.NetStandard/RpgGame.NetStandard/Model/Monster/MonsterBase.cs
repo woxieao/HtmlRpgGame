@@ -1,4 +1,4 @@
-﻿namespace RpgGame.Model.Monster
+﻿namespace RpgGame.NetStandard.Model.Monster
 {
     internal abstract class MonsterBase
     {

@@ -1,4 +1,4 @@
-﻿namespace RpgGame.StartUp
+﻿namespace RpgGame.NetStandard.StartUp
 {
     public sealed class Config
     {

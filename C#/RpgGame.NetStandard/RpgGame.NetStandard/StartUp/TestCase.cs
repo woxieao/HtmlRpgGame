@@ -1,7 +1,6 @@
-﻿using RpgGame.Model.DataBase;
-using RpgGame.Model.Item;
+﻿using RpgGame.NetStandard.Model.Item;
 
-namespace RpgGame.StartUp
+namespace RpgGame.NetStandard.StartUp
 {
     public sealed class TestCase
     {
@@ -9,7 +8,7 @@ namespace RpgGame.StartUp
         {
             var mdc = new RedMedicine();
             var xx = mdc.Me.Count;
-
+          
         }
     }
 }

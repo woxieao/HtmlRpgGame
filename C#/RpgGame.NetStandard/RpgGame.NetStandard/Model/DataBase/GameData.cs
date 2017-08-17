@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using RpgGame.Model.Exceptions;
-using RpgGame.Model.Language;
+using RpgGame.NetStandard.Model.Exceptions;
+using RpgGame.NetStandard.Model.Language;
 
-namespace RpgGame.Model.DataBase
+namespace RpgGame.NetStandard.Model.DataBase
 {
     public class Counter
     {
@@ -18,27 +17,16 @@ namespace RpgGame.Model.DataBase
         /// </summary>
         /// <param name="item2Add"></param>
         /// <param name="count">minus/plus count</param>
-        public void AddItem<T>(T item2Add, int count)
+        public void AddItem(dynamic item2Add, int count)
         {
-            if (Base != null)
+            if (Count - count < 0)
             {
-                if (Count - count < 0)
-                {
-                    throw new MsgException("物品数量不足".L());
-                }
-                Count += count;
+                throw new MsgException("物品数量不足");
             }
-            else
-            {
-                if (count <= 0)
-                {
-                    throw new MsgException("物品数量需为正数".L());
-                }
-                Base = item2Add;
-                Count = count;
-            }
+            Base = item2Add;
+            Count += count;
         }
-        public dynamic Base { private get; set; }
+        public dynamic Base { get; set; }
         public int Count { get; private set; }
     }
     public sealed class GameData
@@ -49,7 +37,14 @@ namespace RpgGame.Model.DataBase
         static GameData()
         {
             ItemList = new List<Counter>();
+            LanType = LanguageType.Cn;
+            Gold = 0;
         }
+        public static void ChangeLanguage(LanguageType lanType)
+        {
+            LanType = lanType;
+        }
+
         public static Counter GetItem<T>(T item2Get)
         {
             var itemInfo = ItemList.SingleOrDefault(i => i.GetType() == item2Get.GetType());

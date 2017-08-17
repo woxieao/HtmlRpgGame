@@ -1,4 +1,4 @@
-﻿namespace RpgGame.Model.Player
+﻿namespace RpgGame.NetStandard.Model.Player
 {
     public abstract class PlayerBase : IPlayBehaviour
     {
