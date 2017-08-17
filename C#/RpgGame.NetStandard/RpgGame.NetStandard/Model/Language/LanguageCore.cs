@@ -1,15 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using RpgGame.NetStandard.Model.DataBase;
+using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
 
 namespace RpgGame.NetStandard.Model.Language
 {
-    public enum LanguageType
-    {
-        Cn = 1,
-        En = 2,
-    }
+
 
     public class LanguageInfo
     {

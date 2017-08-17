@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Item;
 using RpgGame.NetStandard.Model.Language;
 
@@ -13,6 +14,7 @@ namespace RpgGame.NetStandard.Model.DataBase
         public static double Gold;
         public static LanguageType LanType;
         public static readonly Dictionary<Type, ItemCounter> ItemList;
+        public static readonly List< ItemCounter> WeponList;
         static GameData()
         {
             ItemList = new Dictionary<Type, ItemCounter>();
