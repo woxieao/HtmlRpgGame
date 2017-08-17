@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using RpgGame.NetStandard.Model.Exceptions;
 using RpgGame.NetStandard.Model.Language;
 
 namespace RpgGame.NetStandard.Model.DataBase
@@ -12,22 +12,8 @@ namespace RpgGame.NetStandard.Model.DataBase
             Count = 0;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="item2Add"></param>
-        /// <param name="count">minus/plus count</param>
-        public void AddItem(dynamic item2Add, int count)
-        {
-            if (Count - count < 0)
-            {
-                throw new MsgException("物品数量不足");
-            }
-            Base = item2Add;
-            Count += count;
-        }
-        public dynamic Base { get; set; }
-        public int Count { get; private set; }
+        public object Base { get; set; }
+        public int Count { get; internal set; }
     }
     public sealed class GameData
     {
@@ -47,12 +33,12 @@ namespace RpgGame.NetStandard.Model.DataBase
 
         public static Counter GetItem<T>(T item2Get)
         {
-            var itemInfo = ItemList.SingleOrDefault(i => i.GetType() == item2Get.GetType());
+            var itemInfo = ItemList.SingleOrDefault(i => i.Base.GetType() == item2Get.GetType());
             if (itemInfo == null)
             {
                 itemInfo = new Counter
                 {
-                    Base = item2Get
+                    Base = item2Get,
                 };
                 ItemList.Add(itemInfo);
             }

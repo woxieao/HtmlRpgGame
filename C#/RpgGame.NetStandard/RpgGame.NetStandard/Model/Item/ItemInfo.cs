@@ -17,10 +17,21 @@ namespace RpgGame.NetStandard.Model.Item
             Price = typeInfo.Price;
             Effect = typeInfo.Effect;
             _isUseSuccess = isUseSuccess;
-            Me = GameData.GetItem(this);
+            _me = GameData.GetItem(this);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="count">minus/plus count</param>
+        public void AddItem(int count)
+        {
+            _me.Count += count;
+        }
+
         private readonly Func<object, ItemInfo, bool> _isUseSuccess;
-        public Counter Me;
+        private readonly Counter _me;
+        public int Count => _me.Count;
         private readonly string _name;
         private readonly string _description;
 
@@ -38,11 +49,11 @@ namespace RpgGame.NetStandard.Model.Item
             {
                 throw new MsgException("使用数量不能小于等于0");
             }
-            if (Me.Count > 0)
+            if (_me.Count > 0)
             {
                 for (var i = 0; i < useCount && _isUseSuccess(target, this); i++)
                 {
-                    Me.AddItem(this, -useCount);
+                    AddItem(-useCount);
                 }
             }
             else
@@ -56,9 +67,9 @@ namespace RpgGame.NetStandard.Model.Item
             {
                 throw new MsgException("出售数量不能小于等于0");
             }
-            if (Me.Count >= sellCount)
+            if (_me.Count >= sellCount)
             {
-                Me.AddItem(this, -sellCount);
+                AddItem(-sellCount);
                 GameData.Gold += sellCount * SellPrice;
             }
             else

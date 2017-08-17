@@ -7,8 +7,7 @@ namespace RpgGame.NetStandard.StartUp
         public static void Test0()
         {
             var mdc = new RedMedicine();
-            var xx = mdc.Me.Count;
-          
+
         }
     }
 }
