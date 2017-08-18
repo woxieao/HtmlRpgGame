@@ -32,7 +32,7 @@ namespace RpgGame.NetStandard.Model.Wepon
             for (var i = 0; i < propLevel.GetHashCode(); i++)
             {
                 var minMax = Helpers.GetEnumFirstLast<EffectType>();
-                EffectList.Add((EffectType)Singleton.Ran.Next(minMax.Min, minMax.Max));
+                EffectList.Add((EffectType)Singleton.Ran.Next(minMax.Item1, minMax.Item2));
             }
             PropLevel = propLevel;
             Level = level;

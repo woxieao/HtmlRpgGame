@@ -9,7 +9,7 @@ namespace RpgGame.NetStandard.Core
     {
         public static T GetAttribute<T>(this object enty) where T : Attribute
         {
-            if (enty.GetType() == typeof(Enum))
+            if (enty.GetType().BaseType == typeof(Enum))
             {
                 var member = enty.GetType().GetMember(enty.ToString());
                 if (member.Length == 0)
@@ -35,13 +35,19 @@ namespace RpgGame.NetStandard.Core
                 }
                 return attr;
             }
-
         }
-        public static (int Min, int Max) GetEnumFirstLast<T>() where T : struct, IConvertible
+        //framework ValueTuple 有bug
+        //public static (int Min, int Max) GetEnumFirstLast<T>() where T : struct, IConvertible
+        //{
+        //    var enumList = Enum.GetValues(typeof(T)).Cast<Enum>();
+        //    var enumerable = enumList as Enum[] ?? enumList.ToArray();
+        //    return new ValueTuple<int, int>(enumerable.First().GetHashCode(), enumerable.Last().GetHashCode()); ;
+        //}
+        public static Tuple<int, int> GetEnumFirstLast<T>() where T : struct, IConvertible
         {
             var enumList = Enum.GetValues(typeof(T)).Cast<Enum>();
             var enumerable = enumList as Enum[] ?? enumList.ToArray();
-            return new ValueTuple<int, int>(enumerable.First().GetHashCode(), enumerable.Last().GetHashCode());
+            return new Tuple<int, int>(enumerable.First().GetHashCode(), enumerable.Last().GetHashCode()); ;
         }
     }
 }
