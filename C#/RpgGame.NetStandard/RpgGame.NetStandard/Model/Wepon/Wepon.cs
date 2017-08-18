@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using RpgGame.NetStandard.Core;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
@@ -36,6 +34,7 @@ namespace RpgGame.NetStandard.Model.Wepon
             }
             PropLevel = propLevel;
             Level = level;
+            ForgeLevel = 1;
             SpecEffect = new PropValue();
             InitSpecEffect();
         }
@@ -54,11 +53,11 @@ namespace RpgGame.NetStandard.Model.Wepon
         public double Hp => GetValue(Config.PropLevelUp.Hp);
         public long ForgeNeedGold => PropLevel.GetHashCode() * Level * Config.PropLevelUp.BaseForgeGold * ForgeLevel * ForgeLevel;
 
-        public double ForgeProbability
+        public int ForgeProbability
         {
             get
             {
-                var prob = 100 - ForgeLevel / 100;
+                var prob = 100 - ForgeLevel;
                 return prob < 1 ? 1 : prob;
             }
         }
@@ -66,20 +65,18 @@ namespace RpgGame.NetStandard.Model.Wepon
         /// <summary>
         /// 强化物品
         /// </summary>
-        /// <param name="forgeMaterialList">强化材料</param>
+        /// <param name="forgeCount">强化材料数量</param>
         /// <returns></returns>
-        public bool Forge<T>(params T[] forgeMaterialList) where T : ItemInfo
+        public bool Forge(int forgeCount = 0)
         {
             if (GameData.Gold <= ForgeNeedGold)
             {
                 throw new MsgException("金币不足");
             }
+            ItemLogic.UseItem(ItemEntity.ForgeStone, forgeCount, this);
+
+            var forgeResult = ItemEntity.ForgeStone.GetItemAttr().Data * forgeCount * 100 + ForgeProbability >= Singleton.Ran.Next(1, 100);
             GameData.Gold -= ForgeNeedGold;
-            foreach (var forgeMaterial in forgeMaterialList)
-            {
-                forgeMaterial.UseItem(1, this);
-            }
-            var forgeResult = (int)((forgeMaterialList.Sum(i => i.Effect) + ForgeProbability) * 100) >= Singleton.Ran.Next(1, 100);
             if (forgeResult)
             {
                 ++ForgeLevel;

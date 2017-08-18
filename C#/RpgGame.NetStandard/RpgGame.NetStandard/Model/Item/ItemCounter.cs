@@ -1,13 +1,15 @@
 ﻿
+using System;
+
 namespace RpgGame.NetStandard.Model.Item
 {
-    public class ItemCounter
+    public class ItemHandler
     {
-        public ItemCounter()
+        public ItemHandler()
         {
             Count = 0;
         }
-        public ItemInfo Base { get; set; }
+        public Action<object> UseItemAct { get; set; }
         public int Count { get; internal set; }
     }
 }

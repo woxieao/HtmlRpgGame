@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
+using RpgGame.NetStandard.Model.Item;
 
 namespace RpgGame.NetStandard.Core
 {
     public static class Helpers
     {
+        public static ItemIntroAttribute GetItemAttr(this ItemEntity item)
+        {
+            return item.GetAttribute<ItemIntroAttribute>();
+        }
         public static T GetAttribute<T>(this object enty) where T : Attribute
         {
             if (enty.GetType().BaseType == typeof(Enum))
