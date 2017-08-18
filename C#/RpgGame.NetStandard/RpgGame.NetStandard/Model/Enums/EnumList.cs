@@ -24,7 +24,7 @@ namespace RpgGame.NetStandard.Model.Enums
         [Description("红")]
         Lv6,
         [Description("黑")]
-        LvMax = 7
+        Lv7
     }
     public enum EffectType
     {
@@ -46,6 +46,8 @@ namespace RpgGame.NetStandard.Model.Enums
         DefensiveImprovePercent,
         [WeponEffect("金币额外获取", 1)]
         GoldImprovePercent,
+        [WeponEffect("额外暴击伤害", 0.5)]
+        CritDamageImprovePercent,
     }
     public enum ItemEntity
     {
