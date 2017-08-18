@@ -9,19 +9,36 @@ namespace RpgGame.NetStandard.Core
     {
         public static T GetAttribute<T>(this object enty) where T : Attribute
         {
-            var attr = enty.GetType().GetTypeInfo().GetCustomAttribute<T>();
-            if (attr == null)
+            if (enty.GetType() == typeof(Enum))
             {
-                throw new MsgException($"对象[{enty.GetType()}]未包含[{typeof(T)}]的属性");
+                var member = enty.GetType().GetMember(enty.ToString());
+                if (member.Length == 0)
+                {
+                    throw new MsgException("该对象无枚举元素");
+                }
+                var attr = member[0].GetCustomAttribute<T>();
+                if (attr == null)
+                {
+                    throw new MsgException($"对象[{enty}]未包含[{typeof(T)}]的属性");
+                }
+                else
+                {
+                    return attr;
+                }
             }
             else
             {
+                var attr = enty.GetType().GetTypeInfo().GetCustomAttribute<T>();
+                if (attr == null)
+                {
+                    throw new MsgException($"对象[{enty}]未包含[{typeof(T)}]的属性"); ;
+                }
                 return attr;
             }
+
         }
         public static (int Min, int Max) GetEnumFirstLast<T>() where T : struct, IConvertible
         {
-
             var enumList = Enum.GetValues(typeof(T)).Cast<Enum>();
             var enumerable = enumList as Enum[] ?? enumList.ToArray();
             return new ValueTuple<int, int>(enumerable.First().GetHashCode(), enumerable.Last().GetHashCode());
