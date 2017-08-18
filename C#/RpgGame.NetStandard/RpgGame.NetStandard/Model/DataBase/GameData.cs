@@ -23,15 +23,12 @@ namespace RpgGame.NetStandard.Model.DataBase
                 {
                     ItemEntity.RedMedicine, new ItemHandler
                     {
-                        UseItemAct = p =>
+                        UseItemAct = (p, count) =>
                         {
                             var player = (PlayerBase) p;
-                            if (player.CurrentHp <= player.MaxHp)
+                            for (var i = 0; i < count && player.CurrentHp <= player.MaxHp; i++)
                             {
-                                AddItem(ItemEntity.RedMedicine, 1);
-                            }
-                            else
-                            {
+                                AddItem(ItemEntity.RedMedicine, -1);
                                 player.CurrentHp += player.MaxHp * ItemEntity.RedMedicine.GetItemAttr().Data;
                             }
                         }
@@ -41,12 +38,12 @@ namespace RpgGame.NetStandard.Model.DataBase
                     ItemEntity.ForgeStone,
                     new ItemHandler
                     {
-                        UseItemAct = p =>
+                        UseItemAct = (p, count) =>
                         {
                             var prop = (Prop) p;
-                            if (prop.ForgeProbability >= 100)
+                            for (var i = 0;i < count &&prop.ForgeProbability(i) < 100;i++)
                             {
-                                AddItem(ItemEntity.ForgeStone, 1);
+                                AddItem(ItemEntity.ForgeStone, -1);
                             }
                         }
                     }

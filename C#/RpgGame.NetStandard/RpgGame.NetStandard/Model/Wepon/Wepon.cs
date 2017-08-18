@@ -53,13 +53,11 @@ namespace RpgGame.NetStandard.Model.Wepon
         public double Hp => GetValue(Config.PropLevelUp.Hp);
         public long ForgeNeedGold => PropLevel.GetHashCode() * Level * Config.PropLevelUp.BaseForgeGold * ForgeLevel * ForgeLevel;
 
-        public int ForgeProbability
+
+        public int ForgeProbability(int forgeStoneCount = 0)
         {
-            get
-            {
-                var prob = 100 - ForgeLevel;
-                return prob < 1 ? 1 : prob;
-            }
+            var prob = 100 - ForgeLevel;
+            return (int)(ItemEntity.ForgeStone.GetItemAttr().Data * 100 * forgeStoneCount + (prob < 1 ? 1 : prob));
         }
 
         /// <summary>
@@ -74,8 +72,7 @@ namespace RpgGame.NetStandard.Model.Wepon
                 throw new MsgException("金币不足");
             }
             ItemLogic.UseItem(ItemEntity.ForgeStone, forgeCount, this);
-
-            var forgeResult = ItemEntity.ForgeStone.GetItemAttr().Data * forgeCount * 100 + ForgeProbability >= Singleton.Ran.Next(1, 100);
+            var forgeResult = ForgeProbability(forgeCount) >= Singleton.Ran.Next(1, 100);
             GameData.Gold -= ForgeNeedGold;
             if (forgeResult)
             {

@@ -60,16 +60,11 @@ namespace RpgGame.NetStandard.Core
                 throw new MsgException("使用数量不能小于等于0");
             }
             var itemInfo = GameData.ItemList[item];
-
             if (itemInfo.Count < useCount)
             {
                 throw new MsgException("物品数量不足");
             }
-            GameData.AddItem(item, -useCount);
-            for (var i = 0; i < useCount; i++)
-            {
-                itemInfo.UseItemAct(target);
-            }
+            itemInfo.UseItemAct(target, useCount);
         }
         protected void SellItem(ItemEntity item, int sellCount)
         {

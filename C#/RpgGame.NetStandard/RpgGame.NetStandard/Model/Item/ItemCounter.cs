@@ -9,7 +9,7 @@ namespace RpgGame.NetStandard.Model.Item
         {
             Count = 0;
         }
-        public Action<object> UseItemAct { get; set; }
+        public Action<object, int> UseItemAct { get; set; }
         public int Count { get; internal set; }
     }
 }
