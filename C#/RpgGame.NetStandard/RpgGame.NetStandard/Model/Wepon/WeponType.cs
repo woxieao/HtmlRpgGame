@@ -4,12 +4,12 @@ namespace RpgGame.NetStandard.Model.Wepon
 {
     public class WeponEffectAttribute : Attribute
     {
-        public WeponEffectAttribute(string description, double effect)
+        public WeponEffectAttribute(string description, double effectValue)
         {
             Description = description;
-            Effect = effect;
+            EffectValue = effectValue;
         }
         public string Description { get; private set; }
-        public double Effect { get; private set; }
+        public double EffectValue { get; private set; }
     }
 }

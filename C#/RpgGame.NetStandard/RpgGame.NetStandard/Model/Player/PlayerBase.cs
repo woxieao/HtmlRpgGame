@@ -1,4 +1,5 @@
 ﻿using RpgGame.NetStandard.Model.Enums;
+using RpgGame.NetStandard.Model.Wepon;
 using RpgGame.NetStandard.StartUp;
 
 namespace RpgGame.NetStandard.Model.Player
@@ -6,14 +7,20 @@ namespace RpgGame.NetStandard.Model.Player
     public abstract class PlayerBase : IPlayBehaviour
     {
 
-        private double GetValue(double baseValue, bool changeWithLv)
+
+        private double GetValue(double baseValue, params Prop[] equipList)
         {
-            return baseValue * (int)PropLevel * (changeWithLv ? Level : 1);
+            //foreach (var equip in equipList)
+            //{
+            //    equip.SpecEffect.
+            //}
+            //return baseValue * (int)PropLevel * ( ? Level : 1);
+            return 0;
         }
 
         public PropType PropLevel { get; protected set; }
         private double _currentHp;
-        public int Level => (int)(Exp / Config.EveryLevelExp);
+        public int Level => (int)(Exp / Config.PersonLevelUp.EveryLevelNeedsExp);
         /// <summary>
         /// 经验
         /// </summary>
@@ -21,7 +28,7 @@ namespace RpgGame.NetStandard.Model.Player
         /// <summary>
         /// 血
         /// </summary>
-        public double MaxHp => GetValue(10, true);
+        public double MaxHp => GetValue(10);
 
         /// <summary>
         /// 当前血量
@@ -35,22 +42,21 @@ namespace RpgGame.NetStandard.Model.Player
         /// <summary>
         /// 每回合回血百分百
         /// </summary>
-        public double HpRecover => GetValue(0.01, false);
+        public double HpRecover => GetValue(0.01);
 
         /// <summary>
         /// 防御力
         /// </summary>
-        public double Defensive => GetValue(1, true);
+        public double Defensive => GetValue(1);
 
         /// <summary>
         /// 掉落,暴击
         /// </summary>
-        public double Lucky => GetValue(0.05, false);
+        public double Lucky => GetValue(0.05);
         /// <summary>
         /// 伤害
         /// </summary>
-        public double Strength => GetValue(1, true);
-
+        public double Strength => GetValue(1);
         public void EveryTurnStart()
         {
             throw new System.NotImplementedException();

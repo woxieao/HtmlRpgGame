@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using RpgGame.NetStandard.Core;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Exceptions;
 using RpgGame.NetStandard.Model.Language;
@@ -10,15 +11,23 @@ namespace RpgGame.NetStandard.Model.Item
 
     public abstract class ItemInfo
     {
-        protected ItemInfo(Func<object, ItemInfo, bool> isUseSuccess)
+        protected ItemInfo()
         {
-            var typeInfo = this.GetType().GetTypeInfo().GetCustomAttribute<ItemIntroAttribute>();
+            var typeInfo = this.GetAttribute<ItemIntroAttribute>();
             _name = typeInfo.Name;
             _description = typeInfo.Description;
             Price = typeInfo.Price;
             Effect = typeInfo.Effect;
-            _isUseSuccess = isUseSuccess;
             _me = GetItem();
+        }
+
+        protected ItemInfo(Func<object, ItemInfo, bool> needUse) : this()
+        {
+            _needUse = needUse ?? ((target, me) => true);
+        }
+        protected ItemInfo(Func<ItemInfo, bool> needUse) : this()
+        {
+            _needUse = (target, me) => needUse?.Invoke(me) ?? true;
         }
 
         /// <summary>
@@ -30,7 +39,7 @@ namespace RpgGame.NetStandard.Model.Item
             _me.Count += count;
         }
 
-        private readonly Func<object, ItemInfo, bool> _isUseSuccess;
+        private readonly Func<object, ItemInfo, bool> _needUse;
         private readonly ItemCounter _me;
         public int Count => _me.Count;
         private readonly string _name;
@@ -44,7 +53,7 @@ namespace RpgGame.NetStandard.Model.Item
         public double Effect;
         public double SellPrice => Price / 2;
         public bool IsLocked { get; set; }
-        public void UseItem(int useCount, object target)
+        public void UseItem(int useCount, object target )
         {
             if (useCount <= 0)
             {
@@ -52,14 +61,14 @@ namespace RpgGame.NetStandard.Model.Item
             }
             if (_me.Count > 0)
             {
-                for (var i = 0; i < useCount && _isUseSuccess(target, this); i++)
+                for (var i = 0; i < useCount && _needUse(target, this); i++)
                 {
                     AddItem(-useCount);
                 }
             }
             else
             {
-                throw new MsgException("物品不存在");
+                throw new MsgException("物品数量不足");
             }
         }
         protected void SellItem(int sellCount)
