@@ -68,7 +68,7 @@ namespace RpgGame.NetStandard.Model.Wepon
             ForgeLevel = 1;
             InitSpecEffect();
         }
-        private void InitSpecEffect()
+        protected void InitSpecEffect()
         {
             foreach (var effect in EffectList)
             {
@@ -124,13 +124,26 @@ namespace RpgGame.NetStandard.Model.Wepon
     }
     public class Wepon : Prop
     {
-        public WeponType WeponKind { get; set; }
+        private PropValue _specEffect;
+        private WeponType _weponKind;
+
+        public WeponType WeponKind
+        {
+            get { return _weponKind; }
+            set
+            {
+                _weponKind = value;
+                InitSpecEffect();
+                typeof(PropValue).GetProperty(WeponKind.GetAttribute<WeponTypeAttribute>().EffectValue.ToString()).SetValue(SpecEffect,
+(double)typeof(PropValue).GetProperty(WeponKind.GetAttribute<WeponTypeAttribute>().EffectValue.ToString()).GetValue(SpecEffect) + Config.WeponImprove.WeponTypeImprove);
+            }
+        }
+
+
         public Wepon(PropType propLevel, int level) : base(propLevel, level)
         {
             var minMax = Helpers.GetEnumFirstLast<WeponType>();
             WeponKind = (WeponType)Singleton.Ran.Next(minMax.Item1, minMax.Item2 + 1);
-            typeof(PropValue).GetProperty(WeponKind.GetAttribute<WeponTypeAttribute>().EffectValue.ToString()).SetValue(SpecEffect,
-                (double)typeof(PropValue).GetProperty(WeponKind.GetAttribute<WeponTypeAttribute>().EffectValue.ToString()).GetValue(SpecEffect) + Config.WeponImprove.WeponTypeImprove);
         }
     }
 }
