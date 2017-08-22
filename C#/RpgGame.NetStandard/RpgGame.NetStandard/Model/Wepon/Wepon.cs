@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using RpgGame.NetStandard.Core;
 using RpgGame.NetStandard.Model.Attributes;
 using RpgGame.NetStandard.Model.DataBase;
@@ -15,7 +14,7 @@ namespace RpgGame.NetStandard.Model.Wepon
         {
             [WeponEffect("嗜血", "吸取实际伤害值百分比的血量", 0.1)]
             Bloodthirsty = 1,
-            [WeponEffect("神勇", "攻击力加成", 0.1)]
+            [WeponEffect("骁勇", "攻击力加成", 0.1)]
             StrengthImprovePercent,
             [WeponEffect("幸运", "幸运加成", 0.05)]
             Lucky,
@@ -29,7 +28,7 @@ namespace RpgGame.NetStandard.Model.Wepon
             HpRecoverImprove,
             [WeponEffect("坦克", "防御力加成", 0.1)]
             DefensiveImprovePercent,
-            [WeponEffect("神偷", "金币加成", 1)]
+            [WeponEffect("财神", "金币加成", 1)]
             GoldImprovePercent,
             [WeponEffect("霸主", "暴击伤害提升", 0.5)]
             CritDamageImprovePercent,
@@ -138,7 +137,6 @@ namespace RpgGame.NetStandard.Model.Wepon
 (double)typeof(PropValue).GetProperty(WeponKind.GetAttribute<WeponTypeAttribute>().EffectValue.ToString()).GetValue(SpecEffect) + Config.WeponImprove.WeponTypeImprove);
             }
         }
-
 
         public Wepon(PropType propLevel, int level) : base(propLevel, level)
         {
