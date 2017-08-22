@@ -1,47 +1,101 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
-using RpgGame.NetStandard.Model.Item;
-
+using RpgGame.NetStandard.Model.Player;
+using RpgGame.NetStandard.Model.Wepon;
 using RpgGame.NetStandard.StartUp;
 
 namespace RpgGame.NetStandard.Core
 {
+
     public class Draw
     {
-        public static void OpenChest(PropType propLevel)
+        public static readonly Dictionary<PropType, Dictionary<PropType, double>> ChestProbabilityList = new Dictionary<PropType, Dictionary<PropType, double>>();
+        static Draw()
         {
-            var kind = Singleton.Ran.Next(1, 100);
-            var resultKind = 0;
-            var minMax = Helpers.GetEnumFirstLast<PropType>();
-            for (var i = 1; i < propLevel.GetHashCode(); i++)
+            foreach (PropType prob in Enum.GetValues(typeof(PropType)))
             {
-                resultKind += propLevel.GetHashCode() >= Singleton.Ran.Next(minMax.Item1, minMax.Item2) ? 1 : 0;
+                ChestProbabilityList[prob] = PropDrawLogic(prob);
             }
-            //70% wepon
-            if (kind < 70)
+        }
+        private const double MaxNum = 1000000000;
+        private static double GetProbability(int n)
+        {
+            return 1.0 / Math.Pow(2, n);
+        }
+        private static Dictionary<PropType, double> PropDrawLogic(PropType propLevel)
+        {
+            var probList = new Dictionary<PropType, double>();
+            var minMaxPropType = Helpers.GetEnumFirstLast<PropType>();
+            var minProp = minMaxPropType.Item1;
+            var maxProp = minMaxPropType.Item2;
+            var currentPropLevelProbability = 1.0;
+            var propLevelHash = propLevel.GetHashCode();
+            var baseN = propLevelHash == minProp || propLevelHash == maxProp ? 2 : 3;
+            var nIndex = baseN;
+            for (var i = propLevelHash + 1; i <= maxProp; i++)
             {
+                var problility = GetProbability(nIndex++);
+                currentPropLevelProbability -= problility;
+                probList[(PropType)i] = problility;
+            }
+            nIndex = baseN;
+            for (var i = propLevelHash - 1; i >= minProp; i--)
+            {
+                var problility = GetProbability(nIndex++);
+                currentPropLevelProbability -= problility;
+                probList[(PropType)i] = problility;
+            }
+            probList[propLevel] = currentPropLevelProbability;
+            return probList;
+        }
 
+        public static PropType GetChectResult(PropType probList)
+        {
+            double probility = 0;
+            var ranNum = Singleton.Ran.Next(1, (int)MaxNum + 1);
+            foreach (var prob in ChestProbabilityList[probList])
+            {
+                probility += prob.Value * MaxNum;
+                if (ranNum <= probility)
+                {
+                    return prob.Key;
+                }
+            }
+            throw new MsgException("计算概率时出错");
+        }
+
+        public void OpenChest(PropType propLevel)
+        {
+            var result = GetChectResult(propLevel);
+            var isMulti = Singleton.Ran.Next(3) == 1;
+
+            //炫酷的诅咒宝箱
+            if (propLevel == PropType.Lv10)
+            {
+                result = result == PropType.Lv10 ? PropType.Lv10 : PropType.Lv1;
+                isMulti = false;
             }
             else
             {
+                if (isMulti)
+                {
+                    var maxProbLevel = result.GetHashCode();
+                    while (maxProbLevel > 0)
+                    {
+                        var item = Singleton.Ran.Next(1, maxProbLevel + 1);
+                        maxProbLevel -= item;
+                    }
+                }
+                else
+                {
+                    var wepon = new Wepon(result, GameData.PlayerLevel);
 
-                //var itemList = Assembly.GetAssembly(typeof(ItemInfo)).GetTypes().Where(t => t.IsSubclassOf(typeof(ItemInfo)));
-                ////GetAttribute<ItemIntroAttribute>()
-                //var dict = new Dictionary<PropType, List<ItemInfo>>();
-
-                //foreach (var item in itemList)
-                //{
-                //    var itemAttr = item.GetAttribute<ItemIntroAttribute>();
-                //    if (dict.TryGetValue(itemAttr.PropLevel, out var rewardList))
-                //    {
-                //        rewardList.Add(item.in);
-                //    }
-                //}
+                }
             }
+
 
         }
     }
@@ -80,7 +134,7 @@ namespace RpgGame.NetStandard.Core
             var itemInfo = GameData.ItemList[item];
             if (itemInfo.Count >= sellCount)
             {
-                GameData.AddItem(item, -sellCount);
+                item.AddItem(-sellCount);
                 GameData.Gold += sellCount * itemAttr.SellPrice;
             }
             else
@@ -89,4 +143,13 @@ namespace RpgGame.NetStandard.Core
             }
         }
     }
+    public class BattleLogic
+    {
+        //普通关卡
+        //经验关卡,金币关卡,宝箱关卡=>需要10点体力,体力可以喝体力药水来获得 药水开宝箱获得或者每分钟恢复一点,体力上限 每级+1
+
+    }
 }
+
+
+

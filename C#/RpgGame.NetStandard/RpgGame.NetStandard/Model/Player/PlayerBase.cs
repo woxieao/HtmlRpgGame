@@ -1,4 +1,5 @@
-﻿using RpgGame.NetStandard.Model.Enums;
+﻿using RpgGame.NetStandard.Model.DataBase;
+using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Wepon;
 using RpgGame.NetStandard.StartUp;
 
@@ -12,7 +13,7 @@ namespace RpgGame.NetStandard.Model.Player
         {
             //foreach (var equip in equipList)
             //{
-            //    equip.SpecEffect.
+            //    equip.SpecEffect;
             //}
             //return baseValue * (int)PropLevel * ( ? Level : 1);
             return 0;
@@ -20,11 +21,11 @@ namespace RpgGame.NetStandard.Model.Player
 
         public PropType PropLevel { get; protected set; }
         private double _currentHp;
-        public int Level => (int)(Exp / Config.PersonLevelUp.EveryLevelNeedsExp);
+        
         /// <summary>
         /// 经验
         /// </summary>
-        public double Exp { get; set; }
+
         /// <summary>
         /// 血
         /// </summary>
@@ -54,6 +55,10 @@ namespace RpgGame.NetStandard.Model.Player
         /// </summary>
         public double Lucky => GetValue(0.05);
         /// <summary>
+        /// 命中/闪避
+        /// </summary>
+        public double Agile => GetValue(0.05);
+        /// <summary>
         /// 伤害
         /// </summary>
         public double Strength => GetValue(1);
@@ -72,6 +77,11 @@ namespace RpgGame.NetStandard.Model.Player
             throw new System.NotImplementedException();
         }
     }
+
+    public class Lee : PlayerBase
+    {
+    }
+
     internal interface IPlayBehaviour
     {
         void EveryTurnStart();

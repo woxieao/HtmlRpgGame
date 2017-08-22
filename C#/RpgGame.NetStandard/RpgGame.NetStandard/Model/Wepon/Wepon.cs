@@ -30,7 +30,7 @@ namespace RpgGame.NetStandard.Model.Wepon
             for (var i = 0; i < propLevel.GetHashCode(); i++)
             {
                 var minMax = Helpers.GetEnumFirstLast<EffectType>();
-                EffectList.Add((EffectType)Singleton.Ran.Next(minMax.Item1, minMax.Item2));
+                EffectList.Add((EffectType)Singleton.Ran.Next(minMax.Item1, minMax.Item2 + 1));
             }
             PropLevel = propLevel;
             Level = level;
@@ -72,7 +72,7 @@ namespace RpgGame.NetStandard.Model.Wepon
                 throw new MsgException("金币不足");
             }
             ItemLogic.UseItem(ItemEntity.ForgeStone, forgeCount, this);
-            var forgeResult = ForgeProbability(forgeCount) >= Singleton.Ran.Next(1, 100);
+            var forgeResult = ForgeProbability(forgeCount) >= Singleton.Ran.Next(1, 101);
             GameData.Gold -= ForgeNeedGold;
             if (forgeResult)
             {

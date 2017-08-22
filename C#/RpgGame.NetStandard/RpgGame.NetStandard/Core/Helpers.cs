@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
 using RpgGame.NetStandard.Model.Item;
@@ -54,6 +55,11 @@ namespace RpgGame.NetStandard.Core
             var enumList = Enum.GetValues(typeof(T)).Cast<Enum>();
             var enumerable = enumList as Enum[] ?? enumList.ToArray();
             return new Tuple<int, int>(enumerable.First().GetHashCode(), enumerable.Last().GetHashCode()); ;
+        }
+
+        public static void AddItem(this ItemEntity item, int count)
+        {
+            GameData.ItemList[item].Count += count;
         }
     }
 }
