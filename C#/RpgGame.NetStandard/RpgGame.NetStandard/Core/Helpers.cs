@@ -5,7 +5,6 @@ using RpgGame.NetStandard.Model.Attributes;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
-using RpgGame.NetStandard.Model.Item;
 
 namespace RpgGame.NetStandard.Core
 {

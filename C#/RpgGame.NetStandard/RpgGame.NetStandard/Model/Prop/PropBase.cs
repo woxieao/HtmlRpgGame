@@ -6,7 +6,7 @@ using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
 using RpgGame.NetStandard.StartUp;
 
-namespace RpgGame.NetStandard.Model.Wepon
+namespace RpgGame.NetStandard.Model.Prop
 {
     public class PropValue
     {
@@ -28,7 +28,7 @@ namespace RpgGame.NetStandard.Model.Wepon
             HpRecoverImprove,
             [WeponEffect("坦克", "防御力加成", 0.1)]
             DefensiveImprovePercent,
-            [WeponEffect("财神", "金币加成", 1)]
+            [WeponEffect("吸金", "金币加成", 1)]
             GoldImprovePercent,
             [WeponEffect("霸主", "暴击伤害提升", 0.5)]
             CritDamageImprovePercent,
@@ -48,13 +48,13 @@ namespace RpgGame.NetStandard.Model.Wepon
         public double AgileImprovePercent { get; set; }
     }
 
-    public abstract class Prop
+    public abstract class PropBase
     {
-        protected Prop()
+        protected PropBase()
         {
             SpecEffect = new PropValue();
         }
-        protected Prop(PropType propLevel, int level) : this()
+        protected PropBase(PropType propLevel, int level) : this()
         {
             EffectList = new List<PropValue.EffectType>();
             for (var i = 0; i < propLevel.GetHashCode(); i++)
@@ -99,7 +99,7 @@ namespace RpgGame.NetStandard.Model.Wepon
             {
                 throw new MsgException("金币不足");
             }
-            ItemLogic.UseItem(ItemEntity.ForgeStone, forgeCount, this);
+            ItemEntity.ForgeStone.UseItemActAndCheck(forgeCount, this);
             var forgeResult = ForgeProbability(forgeCount) >= Singleton.Ran.Next(1, 101);
             GameData.Gold -= ForgeNeedGold;
             if (forgeResult)
@@ -120,28 +120,5 @@ namespace RpgGame.NetStandard.Model.Wepon
 
         public int Level { get; protected set; }
         public List<PropValue.EffectType> EffectList { get; set; }
-    }
-    public class Wepon : Prop
-    {
-        private PropValue _specEffect;
-        private WeponType _weponKind;
-
-        public WeponType WeponKind
-        {
-            get { return _weponKind; }
-            set
-            {
-                _weponKind = value;
-                InitSpecEffect();
-                typeof(PropValue).GetProperty(WeponKind.GetAttribute<WeponTypeAttribute>().EffectValue.ToString()).SetValue(SpecEffect,
-(double)typeof(PropValue).GetProperty(WeponKind.GetAttribute<WeponTypeAttribute>().EffectValue.ToString()).GetValue(SpecEffect) + Config.WeponImprove.WeponTypeImprove);
-            }
-        }
-
-        public Wepon(PropType propLevel, int level) : base(propLevel, level)
-        {
-            var minMax = Helpers.GetEnumFirstLast<WeponType>();
-            WeponKind = (WeponType)Singleton.Ran.Next(minMax.Item1, minMax.Item2 + 1);
-        }
     }
 }

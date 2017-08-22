@@ -1,6 +1,6 @@
 ﻿using System;
 using RpgGame.NetStandard.Core;
-using RpgGame.NetStandard.Model.Wepon;
+using RpgGame.NetStandard.Model.Prop;
 using RpgGame.NetStandard.StartUp;
 
 namespace RpgGame.NetStandard.Model.Attributes

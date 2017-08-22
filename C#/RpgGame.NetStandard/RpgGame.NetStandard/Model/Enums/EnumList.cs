@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using RpgGame.NetStandard.Model.Attributes;
 using RpgGame.NetStandard.Model.Item;
+using RpgGame.NetStandard.Model.Prop;
 using RpgGame.NetStandard.Model.Wepon;
 
 namespace RpgGame.NetStandard.Model.Enums
@@ -40,6 +41,8 @@ namespace RpgGame.NetStandard.Model.Enums
         RedMedicine = 1,
         [ItemIntro("锻造石", "增加锻造{0:P1}成功概率", 0.05, PropType.Lv4)]
         ForgeStone,
+
+        #region 宝箱相关
         [ItemIntro("宝箱钥匙", "开启宝箱", 0, PropType.Lv2, 1000)]
         ChestKey,
         [ItemIntro("宝箱Lv1", "破旧的箱子散发出一股奇怪的味道", 1, PropType.Lv1)]
@@ -52,6 +55,32 @@ namespace RpgGame.NetStandard.Model.Enums
         Chest4,
         [ItemIntro("诅咒宝箱", "猩红的盒子传来一阵恶寒", 20, PropType.Lv10)]
         Chest10,
+        #endregion
+
+        #region 金币相关
+        [ItemIntro("钱袋", "沉甸甸的钱袋子", 1000, PropType.Lv3)]
+        PurseLv3,
+
+        [ItemIntro("钱箱", "一箱金子", 2000, PropType.Lv4)]
+        PurseLv4,
+
+        [ItemIntro("宝库", "金晃晃的宝藏令人窒息", 10000, PropType.Lv5)]
+        PurseLv5,
+        #endregion
+
+        #region 待补充
+        [ItemIntro("占位6", "待开发...Lv6物品", 0, PropType.Lv6)]
+        WaitForCreate6,
+        [ItemIntro("占位7", "待开发...Lv7物品", 0, PropType.Lv7)]
+        WaitForCreate7,
+        [ItemIntro("占位8", "待开发...Lv8物品", 0, PropType.Lv8)]
+        WaitForCreate8,
+        [ItemIntro("占位9", "待开发...Lv9物品", 0, PropType.Lv9)]
+        WaitForCreate9,
+        [ItemIntro("占位10", "待开发...Lv10物品", 0, PropType.Lv10)]
+        WaitForCreate10,
+        #endregion
+
     }
     public enum WeponType
     {

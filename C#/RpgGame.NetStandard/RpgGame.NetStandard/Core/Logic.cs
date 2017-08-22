@@ -11,16 +11,15 @@ namespace RpgGame.NetStandard.Core
 
     public class Draw
     {
-
         public class ChestResult
         {
             public ChestResult()
             {
-                WeponList = new List<Wepon>();
-                ItemList = new List<ItemEntity>();
+                WeponList = new List<WeponInfo>();
+                ItemList = new Dictionary<ItemEntity, int>();
             }
-            public List<Wepon> WeponList { get; set; }
-            public List<ItemEntity> ItemList { get; set; }
+            public List<WeponInfo> WeponList { get; set; }
+            public Dictionary<ItemEntity, int> ItemList { get; set; }
         }
         public static readonly Dictionary<PropType, Dictionary<PropType, double>> ChestProbabilityList = new Dictionary<PropType, Dictionary<PropType, double>>();
         public static readonly Dictionary<PropType, List<ItemEntity>> ItemPropList = new Dictionary<PropType, List<ItemEntity>>();
@@ -76,7 +75,7 @@ namespace RpgGame.NetStandard.Core
             return probList;
         }
 
-        public static PropType GetChectResult(PropType probList)
+        private static PropType GetChectResult(PropType probList)
         {
             double probility = 0;
             var ranNum = Singleton.Ran.Next(1, (int)MaxNum + 1);
@@ -91,12 +90,44 @@ namespace RpgGame.NetStandard.Core
             throw new MsgException("计算概率时出错");
         }
 
-        public static ChestResult OpenChest(PropType propLevel)
+        public static ChestResult OpenChestResult(ItemEntity chest, int count)
         {
-            var chestResult = new ChestResult();
+            var itemInfo = chest.GetItemAttr();
+            var needKeyCount = (int)itemInfo.Data * count;
+            if (GameData.ItemList[chest].Count < needKeyCount)
+            {
+                throw new MsgException($"开启[{count}]个[{itemInfo.Name}]需要[{needKeyCount}]把钥匙,你的钥匙不足");
+            }
+            var openResult = new ChestResult();
+            for (var i = 0; i < count; i++)
+            {
+                OpenChest(itemInfo.PropLevel, openResult);
+            }
+            foreach (var item in openResult.ItemList)
+            {
+                item.Key.AddItem(item.Value);
+            }
+            GameData.WeponList.AddRange(openResult.WeponList);
+            chest.AddItem(-count);
+            ItemEntity.ChestKey.AddItem(-(int)chest.GetItemAttr().Data * count);
+            return openResult;
+        }
+        private static ChestResult OpenChest(PropType propLevel, ChestResult chestResult)
+        {
             var result = GetChectResult(propLevel);
             var isMulti = Singleton.Ran.Next(3) == 1;
-
+            Action<PropType> addItem = (itemProb) =>
+            {
+                var itemType = ItemPropList[itemProb][Singleton.Ran.Next(0, ItemPropList[itemProb].Count)];
+                if (chestResult.ItemList.ContainsKey(itemType))
+                {
+                    ++chestResult.ItemList[itemType];
+                }
+                else
+                {
+                    chestResult.ItemList[itemType] = 1;
+                }
+            };
             //炫酷的诅咒宝箱
             if (propLevel == PropType.Lv10)
             {
@@ -108,14 +139,22 @@ namespace RpgGame.NetStandard.Core
                 var maxProbLevel = result.GetHashCode();
                 while (maxProbLevel > 0)
                 {
-                    var item = Singleton.Ran.Next(1, maxProbLevel + 1);
-                    maxProbLevel -= item;
-                    chestResult.ItemList.Add(ItemPropList[(PropType)item][Singleton.Ran.Next(0, ItemPropList[(PropType)item].Count)]);
+                    var itemProb = (PropType)Singleton.Ran.Next(1, maxProbLevel + 1);
+                    maxProbLevel -= itemProb.GetHashCode();
+                    addItem(itemProb);
                 }
             }
             else
             {
-                chestResult.WeponList.Add(new Wepon(result, GameData.PlayerLevel));
+                var isWepon = Singleton.Ran.Next(2) == 1;
+                if (isWepon)
+                {
+                    chestResult.WeponList.Add(new WeponInfo(result, GameData.PlayerLevel));
+                }
+                else
+                {
+                    addItem(result);
+                }
             }
             return chestResult;
         }
@@ -126,9 +165,15 @@ namespace RpgGame.NetStandard.Core
         {
         }
     }
-    public class ItemLogic
+    public static class ItemLogic
     {
-        public static void UseItem(ItemEntity item, int useCount, object target)
+        /// <summary>
+        /// 使用物品并校验
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="useCount"></param>
+        /// <param name="target"></param>
+        public static void UseItemActAndCheck(this ItemEntity item, int useCount, object target)
         {
             if (useCount <= 0)
             {
@@ -137,11 +182,11 @@ namespace RpgGame.NetStandard.Core
             var itemInfo = GameData.ItemList[item];
             if (itemInfo.Count < useCount)
             {
-                throw new MsgException("物品数量不足");
+                throw new MsgException("道具数量不足");
             }
             itemInfo.UseItemAct(target, useCount);
         }
-        protected void SellItem(ItemEntity item, int sellCount)
+        public static void SellItem(this ItemEntity item, int sellCount)
         {
             var itemAttr = item.GetItemAttr();
             if (!itemAttr.SellInMarket)
@@ -169,6 +214,13 @@ namespace RpgGame.NetStandard.Core
         //普通关卡
         //经验关卡,金币关卡,宝箱关卡=>需要10点体力,体力可以喝体力药水来获得 药水开宝箱获得或者每分钟恢复一点,体力上限 每级+1
 
+    }
+    public class Output
+    {
+        public static void Msg(string msg)
+        {
+            Console.WriteLine(msg);
+        }
     }
 }
 
