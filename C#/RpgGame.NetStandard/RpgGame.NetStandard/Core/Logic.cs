@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
-using RpgGame.NetStandard.Model.Player;
 using RpgGame.NetStandard.Model.Wepon;
 using RpgGame.NetStandard.StartUp;
 
@@ -12,12 +11,37 @@ namespace RpgGame.NetStandard.Core
 
     public class Draw
     {
+
+        public class ChestResult
+        {
+            public ChestResult()
+            {
+                WeponList = new List<Wepon>();
+                ItemList = new List<ItemEntity>();
+            }
+            public List<Wepon> WeponList { get; set; }
+            public List<ItemEntity> ItemList { get; set; }
+        }
         public static readonly Dictionary<PropType, Dictionary<PropType, double>> ChestProbabilityList = new Dictionary<PropType, Dictionary<PropType, double>>();
+        public static readonly Dictionary<PropType, List<ItemEntity>> ItemPropList = new Dictionary<PropType, List<ItemEntity>>();
         static Draw()
         {
             foreach (PropType prob in Enum.GetValues(typeof(PropType)))
             {
                 ChestProbabilityList[prob] = PropDrawLogic(prob);
+            }
+
+            foreach (ItemEntity item in Enum.GetValues(typeof(ItemEntity)))
+            {
+                var itemProb = item.GetItemAttr().PropLevel;
+                if (ItemPropList.TryGetValue(itemProb, out var itemList))
+                {
+                    itemList.Add(item);
+                }
+                else
+                {
+                    ItemPropList[itemProb] = new List<ItemEntity> { item };
+                }
             }
         }
         private const double MaxNum = 1000000000;
@@ -67,8 +91,9 @@ namespace RpgGame.NetStandard.Core
             throw new MsgException("计算概率时出错");
         }
 
-        public void OpenChest(PropType propLevel)
+        public static ChestResult OpenChest(PropType propLevel)
         {
+            var chestResult = new ChestResult();
             var result = GetChectResult(propLevel);
             var isMulti = Singleton.Ran.Next(3) == 1;
 
@@ -78,25 +103,21 @@ namespace RpgGame.NetStandard.Core
                 result = result == PropType.Lv10 ? PropType.Lv10 : PropType.Lv1;
                 isMulti = false;
             }
-            else
+            if (isMulti)
             {
-                if (isMulti)
+                var maxProbLevel = result.GetHashCode();
+                while (maxProbLevel > 0)
                 {
-                    var maxProbLevel = result.GetHashCode();
-                    while (maxProbLevel > 0)
-                    {
-                        var item = Singleton.Ran.Next(1, maxProbLevel + 1);
-                        maxProbLevel -= item;
-                    }
-                }
-                else
-                {
-                    var wepon = new Wepon(result, GameData.PlayerLevel);
-
+                    var item = Singleton.Ran.Next(1, maxProbLevel + 1);
+                    maxProbLevel -= item;
+                    chestResult.ItemList.Add(ItemPropList[(PropType)item][Singleton.Ran.Next(0, ItemPropList[(PropType)item].Count)]);
                 }
             }
-
-
+            else
+            {
+                chestResult.WeponList.Add(new Wepon(result, GameData.PlayerLevel));
+            }
+            return chestResult;
         }
     }
     public class DataLogic

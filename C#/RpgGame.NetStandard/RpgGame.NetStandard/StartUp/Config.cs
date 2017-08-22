@@ -21,6 +21,10 @@
             public const int Hp = 10;
             public const int BaseForgeGold = 5;
         }
+        public class WeponImprove
+        {
+            public const double WeponTypeImprove = 0.3;
+        }
 
     }
 }

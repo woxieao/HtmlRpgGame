@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using RpgGame.NetStandard.Model.Attributes;
 using RpgGame.NetStandard.Model.Item;
 using RpgGame.NetStandard.Model.Wepon;
 
@@ -32,29 +33,7 @@ namespace RpgGame.NetStandard.Model.Enums
         [Description("钻石")]
         Lv10
     }
-    public enum EffectType
-    {
-        [WeponEffect("吸取实际伤害值百分比的血量", 0.1)]
-        Bloodthirsty = 1,
-        [WeponEffect("攻击力加成", 0.1)]
-        StrengthImprovePercent,
-        [WeponEffect("幸运加成", 0.05)]
-        Lucky,
-        [WeponEffect("经验额外获取", 1)]
-        ExpImprovePercent,
-        [WeponEffect("生命值加成", 0.1)]
-        HpImprovePercent,
-        [WeponEffect("每次攻击额外造成目标当前生命值百分比伤害", 0.05)]
-        DamagePercent,
-        [WeponEffect("每回合回复生命值", 0.05)]
-        HpRecoverImprove,
-        [WeponEffect("防御力加成", 0.1)]
-        DefensiveImprovePercent,
-        [WeponEffect("金币额外获取", 1)]
-        GoldImprovePercent,
-        [WeponEffect("额外暴击伤害", 0.5)]
-        CritDamageImprovePercent,
-    }
+
     public enum ItemEntity
     {
         [ItemIntro("红药水", "回复{0:P1}HP", 0.3, PropType.Lv1, 200)]
@@ -69,9 +48,22 @@ namespace RpgGame.NetStandard.Model.Enums
         Chest2,
         [ItemIntro("宝箱Lv3", "质感极佳的金色宝箱,想必不是凡品", 3, PropType.Lv3)]
         Chest3,
-        [ItemIntro("宝箱Lv4", "流光溢彩的宝箱不安地震动着,仿佛有什么要喷涌而出", 4, PropType.Lv4)]
+        [ItemIntro("宝箱Lv4", "流光溢彩的宝箱不安地震动着,仿佛有什么要逃出来", 4, PropType.Lv4)]
         Chest4,
         [ItemIntro("诅咒宝箱", "猩红的盒子传来一阵恶寒", 20, PropType.Lv10)]
         Chest10,
+    }
+    public enum WeponType
+    {
+        [WeponType("血刃", PropValue.EffectType.Bloodthirsty)]
+        Sword = 1,
+        [WeponType("神箭", PropValue.EffectType.AgileImprovePercent)]
+        Arch,
+        [WeponType("阔斧", PropValue.EffectType.StrengthImprovePercent)]
+        Axe,
+        [WeponType("长矛", PropValue.EffectType.HpImprovePercent)]
+        Spear,
+        [WeponType("大棒", PropValue.EffectType.DefensiveImprovePercent)]
+        Rod
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using RpgGame.NetStandard.Model.Enums;
 
-namespace RpgGame.NetStandard.Model.Item
+namespace RpgGame.NetStandard.Model.Attributes
 {
     public class ItemIntroAttribute : Attribute
     {
