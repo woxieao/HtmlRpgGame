@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using RpgGame.NetStandard.GameInit;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
@@ -54,7 +55,7 @@ namespace RpgGame.NetStandard.Model.Language
         {
             if (LanData.TryGetValue(keyName, out var lanList))
             {
-                var lan = lanList.SingleOrDefault(i => i.LanType == GameData.LanType);
+                var lan = lanList.SingleOrDefault(i => i.LanType == Startup.MyGameData.LanType);
                 return string.Format(lan == null ? keyName : lan.Value, num);
             }
             else

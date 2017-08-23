@@ -1,7 +1,7 @@
 ﻿using System;
 using RpgGame.NetStandard.Core;
+using RpgGame.NetStandard.GameInit;
 using RpgGame.NetStandard.Model.Prop;
-using RpgGame.NetStandard.StartUp;
 
 namespace RpgGame.NetStandard.Model.Attributes
 {

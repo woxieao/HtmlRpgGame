@@ -1,23 +1,58 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using RpgGame.NetStandard.Core;
+using RpgGame.NetStandard.Core.GameLogic;
+using RpgGame.NetStandard.GameInit;
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Item;
 using RpgGame.NetStandard.Model.Player;
 using RpgGame.NetStandard.Model.Prop;
 using RpgGame.NetStandard.Model.Wepon;
-using RpgGame.NetStandard.StartUp;
 
 namespace RpgGame.NetStandard.Model.DataBase
 {
     public class GameData
     {
-        public static double Gold;
-        public static LanguageType LanType;
-        public static readonly List<WeponInfo> WeponList = new List<WeponInfo>();
+    
+        internal GameData()
+        {
+            Startup.MyDataHandler.InitGameData(this);
+            LanType = LanguageType.Cn;
+            Player = new Lee();
+            PlayerExp = 0;
+            ItemEntity.ChestKey.AddItem(999999999);
+            ItemEntity.Chest1.AddItem(999999999);
+            ItemEntity.Chest2.AddItem(999999999);
+            ItemEntity.Chest3.AddItem(999999999);
+            ItemEntity.Chest4.AddItem(999999999);
+            ItemEntity.Chest10.AddItem(999999999);
 
-        public static readonly Dictionary<ItemEntity, ItemHandler> ItemList
+        }
+        public long Gold
+        {
+            get { return _gold; }
+            set
+            {
+                _gold = value;
+                Startup.MyDataHandler.SaveGoldData(Gold);
+                Startup.MyInteractiver.Pop("[金币]" + value);
+            }
+        }
+
+        public LanguageType LanType
+        {
+            get { return _lanType; }
+            set
+            {
+                _lanType = value;
+                Startup.MyDataHandler.SaveLanguageType(LanType);
+            }
+        }
+
+        public readonly List<WeponInfo> WeponList = new List<WeponInfo>();
+
+        public readonly Dictionary<ItemEntity, ItemHandler> ItemList
             = new Dictionary<ItemEntity, ItemHandler>
             {
                 {
@@ -42,68 +77,35 @@ namespace RpgGame.NetStandard.Model.DataBase
                         }
                     })
                 },
-                {
-                    ItemEntity.Chest1, new ItemHandler((gameData, count) =>
-                    {
-                        var giftList = Draw.OpenChestResult(ItemEntity.Chest1, count);
 
-                        var msg = new StringBuilder();
-                        foreach (var item in giftList.ItemList)
-                        {
-                            var itemInfo = item.Key.GetItemAttr();
-                            msg.AppendLine($"[{itemInfo.Name}({itemInfo.PropLevel})]:{item.Value}");
-                        }
-                        msg.AppendLine(
-                            $"[{giftList.WeponList.Count(i => i.WeponKind == WeponType.Axe)}({giftList.WeponList.Count})]");
-                        Output.Msg(msg.ToString());
-                    })
+                #region 宝箱相关
+                {
+                    ItemEntity.Chest1,
+                    new ItemHandler((gameData, count) => { Draw.OpenChestResult(ItemEntity.Chest1, count); })
                 },
                 {
-                    ItemEntity.Chest2, new ItemHandler((gameData, count) =>
-                    {
-                        var giftList = Draw.OpenChestResult(ItemEntity.Chest2, count);
-                    })
+                    ItemEntity.Chest2,
+                    new ItemHandler((gameData, count) => { Draw.OpenChestResult(ItemEntity.Chest2, count); })
                 },
                 {
-                    ItemEntity.Chest3, new ItemHandler((gameData, count) =>
-                    {
-                        var giftList = Draw.OpenChestResult(ItemEntity.Chest3, count);
-                    })
+                    ItemEntity.Chest3,
+                    new ItemHandler((gameData, count) => { Draw.OpenChestResult(ItemEntity.Chest3, count); })
                 },
                 {
-                    ItemEntity.Chest4, new ItemHandler((gameData, count) =>
-                    {
-                        var giftList = Draw.OpenChestResult(ItemEntity.Chest4, count);
-                        var msg = new StringBuilder();
-                        foreach (var item in giftList.ItemList)
-                        {
-                            var itemInfo = item.Key.GetItemAttr();
-                            msg.AppendLine($"[{itemInfo.Name}({itemInfo.PropLevel})]:{item.Value}");
-                        }
-                        msg.AppendLine(
-                            $"[{giftList.WeponList.Count(i => i.WeponKind == WeponType.Axe)}({giftList.WeponList.Count})]");
-                        Output.Msg(msg.ToString());
-                    })
+                    ItemEntity.Chest4,
+                    new ItemHandler((gameData, count) => { Draw.OpenChestResult(ItemEntity.Chest4, count); })
                 },
                 {
-                    ItemEntity.Chest10, new ItemHandler((gameData, count) =>
-                    {
-                        var giftList = Draw.OpenChestResult(ItemEntity.Chest10, count);
-                        var msg = new StringBuilder();
-                        foreach (var item in giftList.ItemList)
-                        {
-                            var itemInfo = item.Key.GetItemAttr();
-                            msg.AppendLine($"[{itemInfo.Name}({itemInfo.PropLevel})]:{item.Value}");
-                        }
-                        msg.AppendLine(
-                            $"[{giftList.WeponList.Count(i => i.WeponKind == WeponType.Axe)}({giftList.WeponList.Count})]");
-                        Output.Msg(msg.ToString());
-                    })
+                    ItemEntity.Chest10,
+                    new ItemHandler((gameData, count) => { Draw.OpenChestResult(ItemEntity.Chest10, count); })
                 },
                 {
                     ItemEntity.ChestKey, new ItemHandler((gameData, count) => { ItemEntity.ChestKey.AddItem(-count); })
                 },
 
+                #endregion
+
+                #region 钱袋相关
                 {
                     ItemEntity.PurseLv3, new ItemHandler((gameData, count) => { })
                 },
@@ -115,6 +117,10 @@ namespace RpgGame.NetStandard.Model.DataBase
                 {
                     ItemEntity.PurseLv5, new ItemHandler((gameData, count) => { })
                 },
+                #endregion
+
+                #region 待补充
+                
                 {
                     ItemEntity.WaitForCreate6, new ItemHandler((gameData, count) => { })
                 },
@@ -130,27 +136,32 @@ namespace RpgGame.NetStandard.Model.DataBase
                 {
                     ItemEntity.WaitForCreate10, new ItemHandler((gameData, count) => { })
                 },
+                #endregion
+
             };
 
-        public static PlayerBase Player;
-        public static int PlayerExp;
-        public static int PlayerLevel => PlayerExp / Config.PersonLevelUp.EveryLevelNeedsExp;
+        private LanguageType _lanType;
 
-        static GameData()
+        public static PlayerBase Player;
+
+        public long PlayerExp
         {
-            LanType = LanguageType.Cn;
-            Gold = 0;
-            Player = new Lee();
-            PlayerExp = 0;
-            ItemEntity.ChestKey.AddItem(999999999);
-            ItemEntity.Chest1.AddItem(999999999);
-            ItemEntity.Chest2.AddItem(999999999);
-            ItemEntity.Chest3.AddItem(999999999);
-            ItemEntity.Chest4.AddItem(999999999);
-            ItemEntity.Chest10.AddItem(999999999);
+            get { return _playerExp; }
+            set
+            {
+                _playerExp = value;
+                Startup.MyDataHandler.SaveExp(PlayerExp);
+            }
         }
 
-        public static void ChangeLanguage(LanguageType lanType)
+        private long _gold;
+        private long _playerExp;
+        public long PlayerLevel => PlayerExp / Config.PersonLevelUp.EveryLevelNeedsExp;
+
+
+
+
+        public void ChangeLanguage(LanguageType lanType)
         {
             LanType = lanType;
         }

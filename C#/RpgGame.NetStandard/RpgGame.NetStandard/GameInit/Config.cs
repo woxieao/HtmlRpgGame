@@ -1,4 +1,4 @@
-﻿namespace RpgGame.NetStandard.StartUp
+﻿namespace RpgGame.NetStandard.GameInit
 {
     internal sealed class Config
     {
@@ -24,6 +24,10 @@
         public class WeponImprove
         {
             public const double WeponTypeImprove = 0.3;
+        }
+        public class GameData
+        {
+            public const string GameDataFilePath = "gamedata.txt";
         }
 
     }

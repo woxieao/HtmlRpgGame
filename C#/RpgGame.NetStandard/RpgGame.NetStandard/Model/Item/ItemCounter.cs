@@ -1,5 +1,6 @@
 ﻿
 using System;
+using RpgGame.NetStandard.GameInit;
 
 namespace RpgGame.NetStandard.Model.Item
 {
@@ -11,6 +12,7 @@ namespace RpgGame.NetStandard.Model.Item
             UseItemAct = useItemAct ?? ((a, b) => { });
         }
         public Action<object, int> UseItemAct { get; }
+
         public int Count { get; internal set; }
     }
 }

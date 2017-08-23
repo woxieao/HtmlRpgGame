@@ -1,4 +1,4 @@
-﻿namespace RpgGame.NetStandard.StartUp
+﻿namespace RpgGame.NetStandard.GameInit
 {
     public sealed class TestCase
     {

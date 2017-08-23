@@ -2,7 +2,6 @@
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Prop;
 using RpgGame.NetStandard.Model.Wepon;
-using RpgGame.NetStandard.StartUp;
 
 namespace RpgGame.NetStandard.Model.Player
 {

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using RpgGame.NetStandard.Core;
+using RpgGame.NetStandard.Core.GameLogic;
+using RpgGame.NetStandard.GameInit;
 using RpgGame.NetStandard.Model.Attributes;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
-using RpgGame.NetStandard.StartUp;
 
 namespace RpgGame.NetStandard.Model.Prop
 {
@@ -54,13 +55,13 @@ namespace RpgGame.NetStandard.Model.Prop
         {
             SpecEffect = new PropValue();
         }
-        protected PropBase(PropType propLevel, int level) : this()
+        protected PropBase(PropType propLevel, long level) : this()
         {
             EffectList = new List<PropValue.EffectType>();
             for (var i = 0; i < propLevel.GetHashCode(); i++)
             {
                 var minMax = Helpers.GetEnumFirstLast<PropValue.EffectType>();
-                EffectList.Add((PropValue.EffectType)Singleton.Ran.Next(minMax.Item1, minMax.Item2 + 1));
+                EffectList.Add((PropValue.EffectType)Startup.Ran.Next(minMax.Item1, minMax.Item2 + 1));
             }
             PropLevel = propLevel;
             Level = level;
@@ -95,13 +96,13 @@ namespace RpgGame.NetStandard.Model.Prop
         /// <returns></returns>
         public bool Forge(int forgeCount = 0)
         {
-            if (GameData.Gold <= ForgeNeedGold)
+            if (Startup.MyGameData.Gold <= ForgeNeedGold)
             {
                 throw new MsgException("金币不足");
             }
             ItemEntity.ForgeStone.UseItemActAndCheck(forgeCount, this);
-            var forgeResult = ForgeProbability(forgeCount) >= Singleton.Ran.Next(1, 101);
-            GameData.Gold -= ForgeNeedGold;
+            var forgeResult = ForgeProbability(forgeCount) >= Startup.Ran.Next(1, 101);
+            Startup.MyGameData.Gold -= ForgeNeedGold;
             if (forgeResult)
             {
                 ++ForgeLevel;
@@ -118,7 +119,7 @@ namespace RpgGame.NetStandard.Model.Prop
             return Level * baseValue * PropLevel.GetHashCode() * ForgeLevel;
         }
 
-        public int Level { get; protected set; }
+        public long Level { get; protected set; }
         public List<PropValue.EffectType> EffectList { get; set; }
     }
 }

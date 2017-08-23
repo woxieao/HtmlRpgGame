@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using RpgGame.NetStandard.GameInit;
 using RpgGame.NetStandard.Model.Attributes;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
@@ -57,9 +58,15 @@ namespace RpgGame.NetStandard.Core
             return new Tuple<int, int>(enumerable.First().GetHashCode(), enumerable.Last().GetHashCode()); ;
         }
 
-        public static void AddItem(this ItemEntity item, int count)
+        public static void AddItem(this ItemEntity item, int count, bool showMsg = true)
         {
-            GameData.ItemList[item].Count += count;
+            var currentItemInfo = Startup.MyGameData.ItemList[item];
+            currentItemInfo.Count += count;
+            Startup.MyDataHandler.SaveItemData(item, currentItemInfo.Count);
+            if (showMsg)
+            {
+                Startup.MyInteractiver.Pop($"[{item.GetItemAttr().Name}] {count}");
+            }
         }
     }
 }
