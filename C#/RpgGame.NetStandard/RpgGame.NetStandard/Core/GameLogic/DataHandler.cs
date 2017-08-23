@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using RpgGame.NetStandard.GameInit;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
@@ -26,29 +28,47 @@ namespace RpgGame.NetStandard.Core.GameLogic
             SerializeObject = serializeObjectFunc;
             DeserializeObject = deserializeObjectFunc;
         }
-        private void AppendOrWrite<T, T2>(string keyName, T data, Func<T2, T2> appendFunc = null)
+        private void AppendOrWrite<T>(string keyName, T data, bool appendToList)
+        {
+            {
+                var dataDict = (Dictionary<string, object>)DeserializeObject(File.ReadAllText(Config.GameData.GameDataFilePath));
+                if (dataDict.TryGetValue(keyName, out var exitData))
+                {
+                    if (appendToList)
+                    {
+                        var existList = exitData as IList<T>;
+                        if (existList != null)
+                        {
+                            existList.Add(data);
+                            dataDict[keyName] = existList;
+                            return;
+                        }
+                    }
+                }
+                dataDict[keyName] = data;
+            }
+        }
+        private void AppendOrWrite<T>(string keyName, T data, Func<IDictionary<string, T>, T> func)
         {
             var dataDict = (Dictionary<string, object>)DeserializeObject(File.ReadAllText(Config.GameData.GameDataFilePath));
             if (dataDict.TryGetValue(keyName, out var exitData))
             {
-                if (appendFunc != null)
+                if (func != null)
                 {
-                    dataDict[keyName] = appendFunc((T2)exitData);
-                }
-                else
-                {
-                    dataDict[keyName] = data;
+                    var existDict = exitData as IDictionary<string, T>;
+                    if (existDict != null)
+                    {
+                        dataDict[keyName] = func(existDict);
+                        return;
+                    }
                 }
             }
-            else
-            {
-                dataDict[keyName] = data;
-            }
+            dataDict[keyName] = data;
         }
 
         private void ReadOrCreate()
         {
-            AppendOrWrite<ItemEntity, List<ItemEntity>>("123", ItemEntity.ForgeStone, (list) => { list.Add(ItemEntity.Chest1); return list; });
+            AppendOrWrite("123", ItemEntity.ForgeStone, true);
 
         }
         public void InitGameData(GameData gameData)
