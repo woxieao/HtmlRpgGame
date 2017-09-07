@@ -93,7 +93,7 @@ namespace RpgGame.NetStandard.Core.GameLogic
         {
             var itemInfo = chest.GetItemAttr();
             var needKeyCount = (int)itemInfo.Data * count;
-            if (Startup.MyGameData.ItemList[chest].Count < needKeyCount)
+            if (chest.GetItemInfo().Count < needKeyCount)
             {
                 throw new MsgException($"开启[{count}]个[{itemInfo.Name}]需要[{needKeyCount}]把钥匙,你的钥匙不足");
             }

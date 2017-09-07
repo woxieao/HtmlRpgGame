@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using Newtonsoft.Json;
 using RpgGame.NetStandard.GameInit;
+using RpgGame.NetStandard.Model.Attributes;
 using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
 
@@ -11,94 +11,74 @@ namespace RpgGame.NetStandard.Core.GameLogic
 {
     public interface IDataHandler
     {
-        void SaveItemData(ItemEntity itemEntity, int count);
-        void SaveGoldData(long gold);
-        void SaveLanguageType(LanguageType lan);
-        void SaveExp(long exp);
-        void InitGameData(GameData gameData);
+        GameData InitGameData();
+        void SaveData(GameData gameData);
     }
 
-    public class DataHandler : IDataHandler
+    public class DataHandler //: IDataHandler
     {
-        private Func<object, string> SerializeObject;
-        private Func<string, object> DeserializeObject;
+        private const string GameDataKeyName = "GameData";
+        //private readonly Func<object, string> _serializeObject;
+        //private readonly Func<string, object> _deserializeObject;
 
-        public DataHandler(Func<object, string> serializeObjectFunc, Func<string, object> deserializeObjectFunc)
+        private void CheckFile()
         {
-            SerializeObject = serializeObjectFunc;
-            DeserializeObject = deserializeObjectFunc;
-        }
-        private void AppendOrWrite<T>(string keyName, T data, bool appendToList)
-        {
+            if (!File.Exists(Config.GameData.GameDataFilePath))
             {
-                var dataDict = (Dictionary<string, object>)DeserializeObject(File.ReadAllText(Config.GameData.GameDataFilePath));
-                if (dataDict.TryGetValue(keyName, out var exitData))
-                {
-                    if (appendToList)
-                    {
-                        var existList = exitData as IList<T>;
-                        if (existList != null)
-                        {
-                            existList.Add(data);
-                            dataDict[keyName] = existList;
-                            return;
-                        }
-                    }
-                }
-                dataDict[keyName] = data;
+                using (File.Create(Config.GameData.GameDataFilePath)) { }
             }
         }
-        private void AppendOrWrite<T>(string keyName, T data, Func<IDictionary<string, T>, T> func)
+        //public DataHandler(Func<object, string> serializeObjectFunc, Func<string, object> deserializeObjectFunc)
+        //{
+        //    _serializeObject = serializeObjectFunc;
+        //    _deserializeObject = deserializeObjectFunc;
+        //}
+        private enum DataHandleType
         {
-            var dataDict = (Dictionary<string, object>)DeserializeObject(File.ReadAllText(Config.GameData.GameDataFilePath));
+            Append = 1,
+            Override = 2
+        }
+        private void AppendOrWrite<T>(string keyName, T data, DataHandleType handleType)
+        {
+            CheckFile();
+            var dataDict = (JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(Config.GameData.GameDataFilePath)) ??
+                           new Dictionary<string, object>());
             if (dataDict.TryGetValue(keyName, out var exitData))
             {
-                if (func != null)
+                if (handleType == DataHandleType.Append)
                 {
-                    var existDict = exitData as IDictionary<string, T>;
-                    if (existDict != null)
+                    if (exitData is IList<T> existList)
                     {
-                        dataDict[keyName] = func(existDict);
+                        existList.Add(data);
+                        dataDict[keyName] = existList;
                         return;
                     }
                 }
             }
             dataDict[keyName] = data;
+            File.WriteAllText(Config.GameData.GameDataFilePath, JsonConvert.SerializeObject(dataDict));
         }
-
-        private void ReadOrCreate()
+        private T ReadOrCreate<T>(string keyName, T defaultValue)
         {
-            AppendOrWrite("123", ItemEntity.ForgeStone, true);
-
+            CheckFile();
+            var dataDict = (JsonConvert.DeserializeObject<Dictionary<string, object>>(File.ReadAllText(Config.GameData.GameDataFilePath)) ??
+                           new Dictionary<string, object>());
+            if (dataDict.TryGetValue(keyName, out var exitData))
+            {
+                return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(exitData));
+            }
+            else
+            {
+                return defaultValue;
+            }
         }
-        public void InitGameData(GameData gameData)
+        public void SaveData(GameData gameData)
         {
-
+            AppendOrWrite(GameDataKeyName, gameData, DataHandleType.Override);
         }
-
-        public void SaveItemData(ItemEntity itemEntity)
+        public GameData InitGameData()
         {
-            throw new System.NotImplementedException();
-        }
-
-        public void SaveGoldData(long gold)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void SaveItemData(ItemEntity itemEntity, int count)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void SaveLanguageType(LanguageType lan)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void SaveExp(long exp)
-        {
-            throw new System.NotImplementedException();
+            return ReadOrCreate(GameDataKeyName, new GameData());
         }
     }
 }

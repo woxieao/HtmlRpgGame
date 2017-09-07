@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using RpgGame.NetStandard.Core.GameLogic;
 using RpgGame.NetStandard.GameInit;
 using RpgGame.NetStandard.Model.Attributes;
-using RpgGame.NetStandard.Model.DataBase;
 using RpgGame.NetStandard.Model.Enums;
 using RpgGame.NetStandard.Model.Exceptions;
 
@@ -15,7 +15,7 @@ namespace RpgGame.NetStandard.Core
         {
             return item.GetAttribute<ItemIntroAttribute>();
         }
-        public static T GetAttribute<T>(this object enty) where T : Attribute
+        public static T GetAttribute<T>(this object enty, bool throwOrReturnNull = true) where T : Attribute
         {
             if (enty.GetType().BaseType == typeof(Enum))
             {
@@ -25,7 +25,7 @@ namespace RpgGame.NetStandard.Core
                     throw new MsgException("该对象无枚举元素");
                 }
                 var attr = member[0].GetCustomAttribute<T>();
-                if (attr == null)
+                if (attr == null && throwOrReturnNull)
                 {
                     throw new MsgException($"对象[{enty}]未包含[{typeof(T)}]的属性");
                 }
@@ -37,7 +37,7 @@ namespace RpgGame.NetStandard.Core
             else
             {
                 var attr = enty.GetType().GetTypeInfo().GetCustomAttribute<T>();
-                if (attr == null)
+                if (attr == null && throwOrReturnNull)
                 {
                     throw new MsgException($"对象[{enty}]未包含[{typeof(T)}]的属性"); ;
                 }
@@ -60,9 +60,9 @@ namespace RpgGame.NetStandard.Core
 
         public static void AddItem(this ItemEntity item, int count, bool showMsg = true)
         {
-            var currentItemInfo = Startup.MyGameData.ItemList[item];
+            var currentItemInfo = item.GetItemInfo();
             currentItemInfo.Count += count;
-            Startup.MyDataHandler.SaveItemData(item, currentItemInfo.Count);
+            Startup.MyDataHandler.SaveData(Startup.MyGameData);
             if (showMsg)
             {
                 Startup.MyInteractiver.Pop($"[{item.GetItemAttr().Name}] {count}");
